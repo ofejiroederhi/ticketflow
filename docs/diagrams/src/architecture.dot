@@ -149,16 +149,14 @@ digraph TicketFlowArchitecture {
 
     CORE [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>Core Services</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">auth · user · event · booking · payment</TD></TR>
-      <TR><TD ALIGN="LEFT">guest · usher · admission · dashboard</TD></TR>
-      <TR><TD ALIGN="LEFT">revenue · retention · reservationSweeper</TD></TR>
+      <TR><TD ALIGN="LEFT">auth · event · booking · admission · guest</TD></TR>
+      <TR><TD ALIGN="LEFT">dashboard · retention · scheduled sweeps</TD></TR>
     </TABLE>>];
 
     MONEY [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>Money Path</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">pricingService — server-authoritative</TD></TR>
-      <TR><TD ALIGN="LEFT">payoutService — Paystack subaccounts</TD></TR>
-      <TR><TD ALIGN="LEFT">3% platform fee · split settlement</TD></TR>
+      <TR><TD ALIGN="LEFT">pricing — server-authoritative</TD></TR>
+      <TR><TD ALIGN="LEFT">payout · 3% fee · split settlement</TD></TR>
     </TABLE>>];
 
     NET [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
@@ -169,16 +167,14 @@ digraph TicketFlowArchitecture {
 
     LOCAL [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>Local Analytics — NO third party</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">anomaly · anomalyReport (rule thresholds)</TD></TR>
-      <TR><TD ALIGN="LEFT">noShow (portable weights file)</TD></TR>
-      <TR><TD ALIGN="LEFT">nlGuestQuery (regex intent parser)</TD></TR>
+      <TR><TD ALIGN="LEFT">anomaly (rules) · nlGuestQuery (regex)</TD></TR>
+      <TR><TD ALIGN="LEFT">noShow — reads ml/no_show/model.json</TD></TR>
     </TABLE>>];
 
     BOT [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>AI Concierge</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">chatbotService — one tool-calling round</TD></TR>
-      <TR><TD ALIGN="LEFT">llmProvider — OpenAI, Gemini fallback</TD></TR>
-      <TR><TD ALIGN="LEFT">weatherService — forecast and advice</TD></TR>
+      <TR><TD ALIGN="LEFT">chatbot — one tool-calling round</TD></TR>
+      <TR><TD ALIGN="LEFT">llmProvider · weatherService</TD></TR>
     </TABLE>>];
 
     BUS [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
@@ -195,16 +191,14 @@ digraph TicketFlowArchitecture {
 
     REPO [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>Repositories</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">user · event · booking · guest</TD></TR>
-      <TR><TD ALIGN="LEFT">auditLog · message</TD></TR>
+      <TR><TD ALIGN="LEFT">user · event · booking · guest · auditLog</TD></TR>
       <TR><TD ALIGN="LEFT">Only layer that touches Mongoose</TD></TR>
     </TABLE>>];
 
     SHARED [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
       <TR><TD ALIGN="CENTER"><B>Shared Utilities</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">email (pug templates) · generateQrCode</TD></TR>
-      <TR><TD ALIGN="LEFT">paystack HMAC · ticketIdGenerator</TD></TR>
-      <TR><TD ALIGN="LEFT">parseGuestCsv · networkingOtp · AppError</TD></TR>
+      <TR><TD ALIGN="LEFT">email · QR codes · ticket IDs</TD></TR>
+      <TR><TD ALIGN="LEFT">paystack HMAC · CSV parsing · errors</TD></TR>
     </TABLE>>];
   }
 
@@ -222,17 +216,10 @@ digraph TicketFlowArchitecture {
       <TR><TD ALIGN="LEFT">Replica set REQUIRED — transactions</TD></TR>
     </TABLE>>];
 
-    MLM [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
-      <TR><TD ALIGN="CENTER"><B>ml/no_show/model.json</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">Portable weights · read-only</TD></TR>
-      <TR><TD ALIGN="LEFT">No runtime training</TD></TR>
-    </TABLE>>];
-
-    CRON [label = <<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="7" COLOR="#2b3a55" BGCOLOR="white">
-      <TR><TD ALIGN="CENTER"><B>Scheduled Jobs</B></TD></TR><HR/>
-      <TR><TD ALIGN="LEFT">gdpr-retention-sweep.js</TD></TR>
-      <TR><TD ALIGN="LEFT">External scheduler / CI cron</TD></TR>
-    </TABLE>>];
+    /* The portable ML weights file and the cron-driven sweeps used to be boxes here. Both
+       sat far from the service that uses them, so each contributed an edge crossing the
+       full height of the drawing for one line of information. They are now named inside
+       the boxes that own them - Local Analytics and Core Services respectively. */
   }
 
   subgraph cluster_ext {
@@ -280,13 +267,16 @@ digraph TicketFlowArchitecture {
   { rank = same; SEC; PRES; }
   { rank = same; CORE; MONEY; NET; LOCAL; BOT; BUS; }
   { rank = same; REPO; SHARED; }
-  { rank = same; MDB; MLM; CRON; }
   { rank = same; PS; CLD; SMTP; LLM; METEO; }
 
   // Both bands are sinks, so nothing ranked them relative to each other and Graphviz drew
   // them side by side - two half-width bands rather than two stacked strips. One invisible
   // edge is enough to settle the order.
-  PS -> MDB [style = invis, weight = 10];
+  //
+  // Infrastructure goes ABOVE external services, not below: the database is one rank under
+  // the repositories that read it, which keeps that edge short and vertical. With the order
+  // reversed it had to travel the full width of the drawing past the external band.
+  MDB -> PS [style = invis, weight = 10];
 
   /* ── Flows ────────────────────────────────────────────────────────────────── */
 
@@ -307,20 +297,19 @@ digraph TicketFlowArchitecture {
   PRES -> LOCAL;
   PRES -> BOT;
 
-  CORE  -> REPO   [label = "REPOSITORY API"];
-  MONEY -> REPO;
-  NET   -> REPO;
-  LOCAL -> REPO;
-  BOT   -> REPO;
-  CORE  -> SHARED;
-  NET   -> SHARED;
+  /* One edge from the service band to the persistence band, rather than one per service.
+     Every service reads through a repository, so five separate arrows stated a rule that a
+     single cluster-to-cluster edge states once - and they were five long horizontal lines
+     crossing everything between the two bands. */
+  CORE -> REPO [ltail = "cluster_service", lhead = "cluster_repo", label = "REPOSITORY API"];
+  CORE -> SHARED;
 
-  REPO   -> MDB   [label = "MONGOOSE ODM"];
-  LOCAL  -> MLM   [label = "READ WEIGHTS"];
-  CRON   -> CORE  [label = "NPM RUN GDPR:SWEEP", style = dashed];
+  REPO -> MDB [label = "MONGOOSE ODM"];
 
-  MONEY  -> PS    [label = "SUBACCOUNT + SPLIT"];
-  CORE   -> PS    [label = "INIT TRANSACTION"];
+  /* One arrow to Paystack, not two. Checkout initiates the transaction and the money path
+     owns the subaccount split, but both are the same integration and drawing them
+     separately cost two full-height edges to say it. */
+  MONEY  -> PS    [label = "TRANSACTION INIT · SUBACCOUNT SPLIT"];
   CORE   -> CLD   [label = "UPLOAD"];
   SHARED -> SMTP  [label = "SEND"];
   BOT    -> LLM   [label = "FETCH"];
