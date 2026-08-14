@@ -206,10 +206,6 @@ jobs:
           fail_ci_if_error: false
 
   # ── Package and publish container images ────────────────────────────────────
-<<<<<<< HEAD
-  #
-=======
->>>>>>> aa014773aa3b25217ec9ce1abd4d3a93a9f185c6
   # This is the CD half, and it is deliberately narrow: it *packages and publishes* a
   # versioned artifact to GitHub's Container Registry. It does not deploy - nothing pulls
   # and runs these images automatically, because no hosting target is configured. Calling
