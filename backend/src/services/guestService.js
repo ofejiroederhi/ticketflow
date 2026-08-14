@@ -1,10 +1,10 @@
-import * as eventRepository from "../repositories/eventRepository.js";
-import * as guestRepository from "../repositories/guestRepository.js";
-import { hasGuestList } from "../models/eventModel.js";
-import * as bookingRepository from "../repositories/bookingRepository.js";
-import { generateInviteToken } from "../shared/utils/inviteToken.js";
-import { sendInvite } from "../shared/utils/sendInvite.js";
-import AppError from "../shared/errors/AppError.js";
+import * as eventRepository from '../repositories/eventRepository.js';
+import * as guestRepository from '../repositories/guestRepository.js';
+import { hasGuestList } from '../models/eventModel.js';
+import * as bookingRepository from '../repositories/bookingRepository.js';
+import { generateInviteToken } from '../shared/utils/inviteToken.js';
+import { sendInvite } from '../shared/utils/sendInvite.js';
+import AppError from '../shared/errors/AppError.js';
 
 /**
  * Guest-list management for invite_only / hybrid events...
@@ -16,21 +16,21 @@ import AppError from "../shared/errors/AppError.js";
  */
 
 const isOwnerOrAdmin = (event, user) =>
-  user?.role === "admin" || Boolean(event.user?.equals?.(user?._id));
+  user?.role === 'admin' || Boolean(event.user?.equals?.(user?._id));
 
 /** Loads the event and asserts the caller may manage its guest list. */
 const authorizeGuestManagement = async (eventId, user) => {
   const event = await eventRepository.findById(eventId);
-  if (!event) throw new AppError("No event found with that ID", 404);
+  if (!event) throw new AppError('No event found with that ID', 404);
   if (!isOwnerOrAdmin(event, user)) {
     throw new AppError(
-      "You do not have permission to manage this guest list",
+      'You do not have permission to manage this guest list',
       403,
     );
   }
   if (!hasGuestList(event)) {
     throw new AppError(
-      "This is a public event. Set it to invite-only or hybrid to add guests.",
+      'This is a public event. Set it to invite-only or hybrid to add guests.',
       400,
     );
   }
@@ -51,7 +51,7 @@ export const importGuests = async (eventId, guests, user) => {
   const event = await authorizeGuestManagement(eventId, user);
 
   if (!Array.isArray(guests) || guests.length === 0) {
-    throw new AppError("Provide at least one guest to import", 400);
+    throw new AppError('Provide at least one guest to import', 400);
   }
 
   const result = { added: [], skipped: [], failed: [] };
@@ -62,8 +62,8 @@ export const importGuests = async (eventId, guests, user) => {
 
     if (!name || !email) {
       result.failed.push({
-        email: email ?? "(missing)",
-        error: "name and email are required",
+        email: email ?? '(missing)',
+        error: 'name and email are required',
       });
       continue;
     }
@@ -114,11 +114,11 @@ const issueInvite = async (event, guest) => {
     event: event._id,
     email: guest.email,
     name: guest.name,
-    ticketType: guest.vip ? "VIP" : "Guest",
+    ticketType: guest.vip ? 'VIP' : 'Guest',
     currency: event.currency,
     price: 0,
-    source: "invite",
-    status: "issued",
+    source: 'invite',
+    status: 'issued',
     inviteToken,
   });
 
@@ -132,7 +132,7 @@ const issueInvite = async (event, guest) => {
       eventName: event.eventName,
       inviteToken,
     });
-    booking.status = "delivered";
+    booking.status = 'delivered';
     await booking.save();
   } catch {
     // Left as 'issued'; organiser can resend later.
