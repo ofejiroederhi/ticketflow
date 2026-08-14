@@ -7,7 +7,7 @@ import { sendInvite } from '../shared/utils/sendInvite.js';
 import AppError from '../shared/errors/AppError.js';
 
 /**
- * Guest-list management for invite_only / hybrid events.
+ * Guest-list management for invite_only / hybrid events...
  *
  * Adding a guest issues an invite: it creates a Guest entry and a linked admission Booking
  * (source: 'invite') carrying a single-use token, then emails the guest a scannable QR.
