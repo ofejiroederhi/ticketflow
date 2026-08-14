@@ -1,13 +1,3 @@
-# Repository-root ignores.
-#
-# `frontend/` and `backend/` carry their own .gitignore files; this one covers the things
-# that sit outside both — the documentation tooling, and downloaded artefacts that land in
-# the working directory and are easy to sweep into a commit with `git add -A`.
-
-# Diagram rendering toolchain. Installed on demand by `npm install` inside docs/diagrams and
-# regenerated from docs/diagrams/package.json — ~425 MB of Chromium and WebAssembly that must
-# never enter the history. The rendered .svg and .png files ARE committed: they are the
-# deliverable, and a reader must not need a toolchain to see a diagram.
 docs/diagrams/node_modules/
 docs/diagrams/.tmp/
 docs/diagrams/package-lock.json
@@ -26,12 +16,4 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Report source material. NOT pushable:
-#  - "Assessment Brief.pdf" states on its own first page that it must not be passed to third
-#    parties or posted on any website. A hosted repository is a website.
-#  - "sample report.pdf" is another team's submitted coursework.
-#  - The .docx draft is a binary that rewrites wholesale on every edit.
-# Git history is permanent in practice, so these are ignored before the first commit rather
-# than deleted in a later one.
-docs/report/*.pdf
-docs/report/*.docx
+**/node_modules/
