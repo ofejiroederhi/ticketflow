@@ -14,8 +14,6 @@ import { releaseExpiredReservations } from '../services/bookingService.js';
  * run is a no-op. `scripts/release-expired-reservations.js` remains available for operators
  * who would rather schedule it externally.
  *
- * The interval must stay comfortably below RESERVATION_TTL_MS (15 minutes) - a sweep slower
- * than the hold itself would let expired seats linger for most of another TTL.
  */
 
 const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
