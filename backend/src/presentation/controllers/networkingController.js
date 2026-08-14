@@ -6,12 +6,6 @@ import {
   MESSAGE_EVENT,
 } from '../../shared/events/networkingEvents.js';
 
-/**
- * Presentation layer for guest networking (Phase 7).
- *
- * Uses Server-Sent Events, same as the live dashboard (Phase 3): server->client push only,
- * no extra dependency. Sending is a normal REST POST, since SSE is receive-only.
- */
 
 /**
  * Emails a one-time code to a guest holding a booking for this event. Public: the caller has
