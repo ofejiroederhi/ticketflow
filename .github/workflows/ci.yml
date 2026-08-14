@@ -205,25 +205,7 @@ jobs:
           name: frontend
           fail_ci_if_error: false
 
-  # ── Package and publish container images ────────────────────────────────────
-<<<<<<< HEAD
-  #
-=======
->>>>>>> aa014773aa3b25217ec9ce1abd4d3a93a9f185c6
-  # This is the CD half, and it is deliberately narrow: it *packages and publishes* a
-  # versioned artifact to GitHub's Container Registry. It does not deploy - nothing pulls
-  # and runs these images automatically, because no hosting target is configured. Calling
-  # that out matters: "published to a registry" and "running in production" are different
-  # claims, and only the first is true here.
-  #
-  # Gated on `needs: [backend, frontend]`, so an image is only ever built from a commit whose
-  # lint, typecheck and full test suite passed. An image built from a red build is worse than
-  # no image: it looks releasable and is not.
-  #
-  # Runs on pushes to `main` only - never on pull_request. A PR runs code from a fork or a
-  # branch that has not been reviewed, and giving that code a token with `packages: write`
-  # would let it publish images under this repository's name.
-  publish:
+ 
     name: Publish container images
     needs: [backend, frontend]
     if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
