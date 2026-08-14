@@ -5,7 +5,7 @@ import { hasGuestList } from '../models/eventModel.js';
 import { authorizeScan } from './admissionService.js';
 
 /**
- * Business logic layer for event management.
+ * Business logic layer for event management...........
  * Framework-agnostic: no req/res/next.
  */
 
