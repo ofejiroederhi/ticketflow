@@ -16,6 +16,7 @@ process.on('uncaughtException', (err) => {
 });
 
 const DB = process.env.DB;
+console.log('db string', db);
 
 mongoose.connect(DB).then(() => {
   console.warn('DB connection successful ✅');
